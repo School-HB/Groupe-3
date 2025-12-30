@@ -35,7 +35,7 @@ Le projet repose sur une architecture hybride optimisée pour la performance et 
 | **Frontend** | React 19 (Vite) | Interface Glassmorphism ultra-réactive et moderne. |
 | **Backend** | Pure PHP 8.x | API REST et logique métier robuste (sans dépendances lourdes). |
 | **Database** | MySQL | Schéma relationnel optimisé pour le suivi scolaire. |
-| **Sécurité** | JWT / Session | Système de rôles (Admin, Enseignant, Elève, Parent). |
+| **Sécurité** | Session / Auth | Système de rôles (Admin, Enseignant). |
 
 ---
 
@@ -46,9 +46,12 @@ Le projet repose sur une architecture hybride optimisée pour la performance et 
 2.  Accédez à [phpMyAdmin](http://localhost/phpmyadmin).
 3.  Créez une base nommée `ecole_plus`.
 4.  Importez le fichier `backend/database_complet.sql`.
+    > [!NOTE]
+    > L'importation inclut déjà un jeu de données de test complet : classes configurées, élèves inscrits et notes de base déjà saisies pour tester immédiatement les bulletins et statistiques.
+
 
 ### 2️⃣ Configuration du Backend
-1.  Assurez-vous que le dossier du projet est dans `C:\xampp\htdocs\g3\ulk`.
+1.  Assurez-vous que le dossier du projet est dans `C:\xampp\htdocs\ulk`.
 2.  Vérifiez les accès dans `backend/db.php` (host, user, password).
 
 ### 3️⃣ Lancement du Frontend
@@ -61,24 +64,16 @@ Le projet repose sur une architecture hybride optimisée pour la performance et 
     ```bash
     npm run dev
     ```
-4.  Ouvrez l'URL : `http://localhost:5173`.
-
----
-
-## 🧪 Outils de Diagnostic & Test
-
-Pour faciliter les tests, un script de seeding a été inclus :
-- **Seeder de Notes** : Accédez à `http://localhost/g3/ulk/backend/seed_random_notes.php` pour remplir la base de données avec des notes aléatoires (configuré pour 1-2 admis par classe).
-
----
+4.  Ouvrez l'URL qui s'affiche dans le terminal.
+--
 
 ## 🔑 Identifiants de Démo
 
 | Profil | Email | Mot de passe |
 | :--- | :--- | :--- |
 | **Administrateur** | `admin@gmail.com` | `admin123` |
-| **Enseignant** | `kalil@yahoo.fr` | `123456` |
-| **Parent/Elève** | `kali@gmail.com` | `123456` |
+| **Enseignant** | `kalil@yahoo.fr` | `123456` (enseignant de Com-écrite et Lecture) |
+
 
 ---
 © 2025 - Projet ECOLE+ Premium v3.1. Développé pour l'excellence académique.
