@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config';
 
 const BulletinEleve = ({ eleveId }) => {
     const [data, setData] = useState(null);
 
     useEffect(() => {
         if (eleveId) {
-            fetch(`http://localhost/Projet/backend/get_bulletin.php?eleve_id=${eleveId}`)
+            fetch(`${API_BASE_URL}/get_bulletin.php?eleve_id=${eleveId}`)
                 .then(res => res.json())
                 .then(res => {
                     if (res.error) console.error(res.error);

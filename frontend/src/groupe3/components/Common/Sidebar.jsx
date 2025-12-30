@@ -44,7 +44,8 @@ const Sidebar = () => {
                 left: isMobile ? (isOpen ? '0' : '-280px') : '0',
                 position: isMobile ? 'fixed' : 'sticky',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                boxShadow: isMobile && isOpen ? '10px 0 30px rgba(0,0,0,0.3)' : 'none'
+                boxShadow: isMobile && isOpen ? '10px 0 30px rgba(0,0,0,0.3)' : 'none',
+                flexShrink: 0
             }}>
                 <div style={styles.logoContainer}>
                     <h2 style={styles.logoText}>Gestion scolaire<span style={{ color: 'var(--primary)' }}></span></h2>
@@ -53,7 +54,7 @@ const Sidebar = () => {
 
                 <nav style={styles.nav}>
                     {user && parseInt(user.doit_changer_mdp) === 0 ? (
-                        <>
+                        <div style={styles.navLinks}>
                             <SidebarLink to="/notes" icon="🏠" label="Tableau de bord" onClick={() => setIsOpen(false)} />
 
                             {(user?.role === 'RESPONSABLE' || user?.role === 'ADMIN') && (
@@ -74,19 +75,21 @@ const Sidebar = () => {
                                     <SidebarLink to="/notes/matieres" icon="📊" label="Consulter Classe" onClick={() => setIsOpen(false)} />
                                 </>
                             )}
-                        </>
+                        </div>
                     ) : (
                         <div style={{ padding: '20px', color: 'var(--primary)', fontWeight: '700', fontSize: '0.8rem', textAlign: 'center' }}>
                             🔒 CHANGEMENT DE MOT DE PASSE REQUIS
                         </div>
                     )}
 
-                    <div style={styles.divider}></div>
-                    <SidebarLink to="/profil/securite" icon="🔒" label="Sécurité" onClick={() => setIsOpen(false)} />
+                    <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+                        <div style={styles.divider}></div>
+                        <SidebarLink to="/profil/securite" icon="🔒" label="Sécurité" onClick={() => setIsOpen(false)} />
 
-                    <div style={styles.logoutContainer} onClick={handleLogout}>
-                        <span style={styles.logoutIcon}>🚪</span>
-                        <span style={styles.logoutText}>Déconnexion</span>
+                        <div style={styles.logoutContainer} onClick={handleLogout}>
+                            <span style={styles.logoutIcon}>🚪</span>
+                            <span style={styles.logoutText}>Déconnexion</span>
+                        </div>
                     </div>
                 </nav>
 
@@ -127,12 +130,15 @@ const SidebarLink = ({ to, icon, label, onClick }) => (
 const styles = {
     sidebar: {
         width: '260px',
-        backgroundColor: 'var(--sidebar-bg)',
-        height: '100vh',
+        backgroundColor: '#2d3250',
+        minHeight: '100vh',
+        height: '100%',
         top: 0,
         display: 'flex',
         flexDirection: 'column',
         zIndex: 1000,
+        color: '#ffffff',
+        borderRight: '1px solid rgba(255,255,255,0.05)',
     },
     mobileHeader: {
         display: window.innerWidth <= 768 ? 'flex' : 'none',
@@ -190,7 +196,11 @@ const styles = {
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
+    },
+    navLinks: {
+        flex: 1,
         padding: '10px 0',
+        overflowY: 'auto',
     },
     link: {
         display: 'flex',
@@ -207,12 +217,13 @@ const styles = {
     divider: {
         height: '1px',
         background: 'rgba(255,255,255,0.1)',
-        margin: '16px 24px',
+        margin: '8px 24px 16px',
     },
     footer: {
+        marginTop: 'auto',
         padding: '24px',
-        borderTop: '1px solid rgba(255,255,255,0.1)',
-        backgroundColor: 'rgba(0,0,0,0.1)',
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+        borderTop: '1px solid rgba(255, 255, 255, 0.1)',
     },
     userCard: {
         display: 'flex',
@@ -251,12 +262,12 @@ const styles = {
         display: 'flex',
         alignItems: 'center',
         padding: '12px 16px',
-        margin: 'auto 16px 16px',
+        margin: '0 16px 8px',
         cursor: 'pointer',
         color: '#f87171',
         gap: '12px',
         borderRadius: '12px',
-        transition: 'background 0.2s',
+        transition: 'all 0.2s ease',
     },
     logoutIcon: {
         fontSize: '1.1rem',

@@ -1,78 +1,84 @@
-# 🏫 ECOLE+ v3.0 Premium | Système de Pilotage Académique
+# 🏫 ECOLE+ v3.1 Premium | Système de Pilotage Académique
 
-> **L'excellence n'est pas un acte, c'est une habitude.** ECOLE+ v3.0 est une plateforme intégrée de gestion scolaire conçue pour harmoniser le suivi pédagogique, la gestion administrative et la communication avec les familles.
+> **L'excellence n'est pas un acte, c'est une habitude.** ECOLE+ est une plateforme de gestion scolaire moderne conçue pour digitaliser l'intégralité du cycle de vie académique : de la configuration des classes à la délibération finale des résultats.
 
 ---
 
 ## 💎 Écosystème de Fonctionnalités
 
 ### 🚀 Cockpit de Pilotage (Administration)
-*   **Tableau de Bord Holistique** : Visualisation instantanée du taux de réussite global et des KPIs critiques.
-*   **Matrice de Configuration** : Gestion dynamique des classes, des séries (A, B, C, D) et une matrice de coefficients personnalisable par matière.
-*   **Contrôle du Staff** : Interface de déploiement et d'affectation des enseignants par matière et par classe.
+*   **Tableau de Bord Holistique** : Visualisation en temps réel des statistiques clés (taux de réussite, effectifs, alertes).
+*   **Configuration Académique** : Gestion structurée des Classes, Séries (A, B, C, D) et Matières.
+*   **Pondération Intelligente** : Matrice de coefficients personnalisables par classe et par matière.
+*   **Gestion du Staff & Élèves** : Interface de déploiement des enseignants et inscription des élèves avec comptes parents liés.
 
-### 📝 Gestion Intelligente des Évaluations
-*   **Terminal de Saisie Enseignant** : Workflow sécurisé (Brouillon > Validation) avec calcul automatique des moyennes pondérées (calcul des moyennes en tenant compte des coefficients).
-*   **Support Multi-Matières** : Gestion robuste des enseignants cross-disciplinaires (ex: "Communication écrite et Lecture").
-*   **Instance de Délibération** : Outil de validation officielle permettant le verrouillage des notes pour un semestre donné.
+### 📝 Gestion des Évaluations (Pôle Enseignant)
+*   **Saisie Dynamique** : Interface premium pour la saisie des notes (Interrogations, Devoirs, Examens).
+*   **Multi-Matières** : Support natif des matières combinées (ex: "Communication écrite et Lecture").
+*   **Workflow de Validation** : Système d'état (Brouillon > Validé) garantissant l'intégrité des données avant calcul des moyennes.
+*   **Dashboard Matière** : Vue analytique par classe et par sujet pour chaque enseignant.
 
-### 📈 Analytique & Communication
-*   **Générateur de Bulletins de Prestige** : Production de bulletins au format PDF professionnel pour les semestres et les synthèses annuelles.
-*   **Portail Parent (Suivi en Direct)** : Interface dédiée permettant aux parents de consulter les résultats de leurs enfants en temps réel.
-*   **Logs de Notifications** : Traçabilité des communications sortantes (Email / WhatsApp) pour un suivi parent-élève sans faille.
-
----
-
-## 🏗️ Architecture Technique
-
-ECOLE+ v3.0 repose sur une architecture **hybride** performante garantissant une réactivité maximale et une robustesse éprouvée :
-
-*   **Frontend Immersif** : 
-    *   Framework : **React.js** (Vite).
-    *   Design : Interface "Glassmorphism" moderne, responsive et optimisée pour l'expérience utilisateur (UX).
-*   **Backend Double Moteur** :
-    *   **Node.js / Express** : Dédié aux services de calcul intensif et aux routes de validation critiques.
-    *   **PHP REST API** : Moteur historique optimisé pour la persistance des données et les statistiques rapides.
-*   **Base de Données** : **MySQL** avec schémas normalisés et intégrité référentielle.
+### 📈 Analytique & Délibération
+*   **Moteur de Calcul Avancé** : Calcul automatique des moyennes semestrielles et annuelles selon les pondérations.
+*   **Instance de Délibération** : Outil de clôture officielle permettant de verrouiller les notes et de générer les décisions d'admission.
+*   **Générateur de Bulletins** : Production de bulletins professionnels (Semestriels & Annuels) au format PDF.
+*   **Logs & Notifications** : Historique des communications avec les familles et logs système.
 
 ---
 
-## 🚀 Installation & Déploiement
+## 🛠️ Architecture Technique
 
-### 📋 Prérequis
-*   **Environnement PHP/MySQL** : XAMPP, WAMP ou équivalent.
-*   **Node.js** : Version 16+ recommandée.
+Le projet repose sur une architecture hybride optimisée pour la performance et la simplicité de déploiement :
 
-### 1️⃣ Mise en Place de la Database
-1. Créez une base de données MySQL nommée `ecole_plus`.
-2. Importez le script structurel : `backend/database_complet.sql`.
+| Composant | Technologie | Rôle |
+| :--- | :--- | :--- |
+| **Frontend** | React 19 (Vite) | Interface Glassmorphism ultra-réactive et moderne. |
+| **Backend** | Pure PHP 8.x | API REST et logique métier robuste (sans dépendances lourdes). |
+| **Database** | MySQL | Schéma relationnel optimisé pour le suivi scolaire. |
+| **Sécurité** | JWT / Session | Système de rôles (Admin, Enseignant, Elève, Parent). |
 
-### 2️⃣ Démarrage du Backend
-Le backend nécessite l'exécution simultanée du serveur Apache (pour PHP) et de l'instance Node.js.
-1. Activez **Apache & MySQL** via votre panneau de contrôle.
-2. Dans le terminal, dossier `/backend` :
-   ```bash
-   npm install
-   npm start
-   ```
+---
+
+## 🚀 Guide d'Installation
+
+### 1️⃣ Préparation de la Base de Données (XAMPP)
+1.  Lancez **Apache** et **MySQL** via XAMPP.
+2.  Accédez à [phpMyAdmin](http://localhost/phpmyadmin).
+3.  Créez une base nommée `ecole_plus`.
+4.  Importez le fichier `backend/database_complet.sql`.
+
+### 2️⃣ Configuration du Backend
+1.  Assurez-vous que le dossier du projet est dans `C:\xampp\htdocs\g3\ulk`.
+2.  Vérifiez les accès dans `backend/db.php` (host, user, password).
 
 ### 3️⃣ Lancement du Frontend
-1. Dans un autre terminal, dossier `/frontend` :
-   ```bash
-   npm install
-   npm run dev
-   ```
-2. Accédez à l'URL locale générée par Vite.
+1.  Ouvrez un terminal dans le dossier `/frontend`.
+2.  Installez les dépendances :
+    ```bash
+    npm install
+    ```
+3.  Démarrez le serveur de développement :
+    ```bash
+    npm run dev
+    ```
+4.  Ouvrez l'URL : `http://localhost:5173`.
 
 ---
 
-## 🔑 Identifiants d'Accès (Mode Démo)
+## 🧪 Outils de Diagnostic & Test
+
+Pour faciliter les tests, un script de seeding a été inclus :
+- **Seeder de Notes** : Accédez à `http://localhost/g3/ulk/backend/seed_random_notes.php` pour remplir la base de données avec des notes aléatoires (configuré pour 1-2 admis par classe).
+
+---
+
+## 🔑 Identifiants de Démo
 
 | Profil | Email | Mot de passe |
 | :--- | :--- | :--- |
 | **Administrateur** | `admin@gmail.com` | `admin123` |
-| **Enseignant** | `kouakou@yahoo.fr` | `1234` |
-
+| **Enseignant** | `kalil@yahoo.fr` | `123456` |
+| **Parent/Elève** | `kali@gmail.com` | `123456` |
 
 ---
-© 2025 - Projet ECOLE+ Premium v3.0. Tous droits réservés.
+© 2025 - Projet ECOLE+ Premium v3.1. Développé pour l'excellence académique.

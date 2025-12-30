@@ -8,6 +8,7 @@ const NotesParMatiere = () => {
     const [teacherData, setTeacherData] = useState([]);
     const [selectedClasseIdx, setSelectedClasseIdx] = useState(0);
     const [notes, setNotes] = useState([]);
+    const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -21,11 +22,21 @@ const NotesParMatiere = () => {
                 fetch(`${API_BASE_URL}/get_teacher_overview.php?user_id=${parsedUser.id}`)
                     .then(res => res.json())
                     .then(data => {
-                        if (!data.error) setTeacherData(data);
+                        console.log("Teacher Overview Data:", data);
+                        if (data && data.error) {
+                            setError(data.error);
+                            setTeacherData([]);
+                        } else if (data) {
+                            setTeacherData(Array.isArray(data) ? data : []);
+                            if (Array.isArray(data) && data.length > 0) {
+                                setSelectedMatiere(data[0].matiere);
+                            }
+                        }
                         setLoading(false);
                     })
                     .catch(err => {
                         console.error(err);
+                        setError("Erreur réseau: " + err.message);
                         setLoading(false);
                     });
             } else {
@@ -48,7 +59,16 @@ const NotesParMatiere = () => {
     }, [selectedMatiere, user]);
 
     const isTeacher = user?.role === 'ENSEIGNANT';
-    const currentClasse = isTeacher && teacherData.length > 0 ? teacherData[selectedClasseIdx] : null;
+    const filteredTeacherData = isTeacher ? teacherData.filter(d =>
+        (d.matiere || '').trim().toLowerCase() === (selectedMatiere || (teacherData.length > 0 ? teacherData[0].matiere : '')).trim().toLowerCase()
+    ) : [];
+    const currentClasse = isTeacher && filteredTeacherData.length > 0 ? filteredTeacherData[selectedClasseIdx] : null;
+
+    useEffect(() => {
+        if (isTeacher && teacherData.length > 0 && !selectedMatiere) {
+            setSelectedMatiere(teacherData[0].matiere);
+        }
+    }, [teacherData, isTeacher, selectedMatiere]);
 
     return (
         <div className="slide-up">
@@ -63,52 +83,85 @@ const NotesParMatiere = () => {
                 </p>
             </header>
 
+            {error && (
+                <div style={{
+                    padding: '15px 20px',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    border: '1px solid #ef4444',
+                    borderRadius: '12px',
+                    color: '#b91c1c',
+                    marginBottom: '20px',
+                    fontSize: '0.9rem',
+                    fontWeight: '600'
+                }}>
+                    ⚠️ {error}
+                </div>
+            )}
+
             <div className="glass-card" style={{ padding: '30px' }}>
                 {isTeacher ? (
                     <>
-                        <div style={{ marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '15px' }}>
-                            <label style={{ fontWeight: '800', color: 'var(--secondary)', fontSize: '0.8rem', textTransform: 'uppercase' }}>
-                                Sélectionner une classe :
-                            </label>
-                            <select
-                                value={selectedClasseIdx}
-                                onChange={(e) => setSelectedClasseIdx(parseInt(e.target.value))}
-                                style={inputStyle}
-                            >
-                                {teacherData.map((c, idx) => (
-                                    <option key={idx} value={idx}>{c.classe_nom}</option>
-                                ))}
-                            </select>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '32px' }}>
+                            <div>
+                                <label style={labelStyle}>Matière :</label>
+                                <select
+                                    value={selectedMatiere}
+                                    onChange={(e) => {
+                                        setSelectedMatiere(e.target.value);
+                                        setSelectedClasseIdx(0); // Reset classe quand la matière change
+                                    }}
+                                    style={inputStyle}
+                                >
+                                    {[...new Set(teacherData.map(d => d.matiere))].map((m, i) => (
+                                        <option key={i} value={m}>{m}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label style={labelStyle}>Classe :</label>
+                                <select
+                                    value={selectedClasseIdx}
+                                    onChange={(e) => setSelectedClasseIdx(parseInt(e.target.value))}
+                                    style={inputStyle}
+                                >
+                                    {filteredTeacherData
+                                        .map((c, idx) => (
+                                            <option key={idx} value={idx}>{c.classe_nom}</option>
+                                        ))
+                                    }
+                                </select>
+                            </div>
                         </div>
 
-                        {currentClasse ? (
+                        {currentClasse && currentClasse.eleves && currentClasse.eleves.length > 0 ? (
                             <div className="table-responsive">
-                                <table style={tableStyle}>
+                                <table style={styles.table}>
                                     <thead>
-                                        <tr style={headerStyle}>
-                                            <th style={thStyle}>Élève</th>
-                                            <th style={thStyle}>D1</th>
-                                            <th style={thStyle}>D2</th>
-                                            <th style={thStyle}>D3</th>
-                                            <th style={thStyle}>I1</th>
-                                            <th style={thStyle}>I2</th>
-                                            <th style={thStyle}>I3</th>
-                                            <th style={thStyle}>E1</th>
-                                            <th style={{ ...thStyle, backgroundColor: '#f8fafc' }}>Moyenne</th>
+                                        <tr style={styles.headerRow}>
+                                            <th style={styles.th}>ÉLÈVE</th>
+                                            <th style={styles.th}>D1</th>
+                                            <th style={styles.th}>D2</th>
+                                            <th style={styles.th}>D3</th>
+                                            <th style={styles.th}>I1</th>
+                                            <th style={styles.th}>I2</th>
+                                            <th style={styles.th}>I3</th>
+                                            <th style={styles.th}>E1</th>
+                                            <th style={{ ...styles.th, backgroundColor: 'rgba(249, 177, 122, 0.1)', color: 'var(--primary)' }}>MOYENNE</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {currentClasse.eleves.map((e, i) => (
-                                            <tr key={i} style={rowStyle}>
-                                                <td style={{ ...tdStyle, fontWeight: '700' }}>{e.eleve}</td>
-                                                <td style={tdStyle}>{e.notes.D1 ?? '-'}</td>
-                                                <td style={tdStyle}>{e.notes.D2 ?? '-'}</td>
-                                                <td style={tdStyle}>{e.notes.D3 ?? '-'}</td>
-                                                <td style={tdStyle}>{e.notes.I1 ?? '-'}</td>
-                                                <td style={tdStyle}>{e.notes.I2 ?? '-'}</td>
-                                                <td style={tdStyle}>{e.notes.I3 ?? '-'}</td>
-                                                <td style={tdStyle}>{e.notes.E1 ?? '-'}</td>
-                                                <td style={{ ...tdStyle, fontWeight: '900', color: 'var(--primary)', backgroundColor: '#f8fafc' }}>
+                                            <tr key={i} style={styles.row}>
+                                                <td style={{ ...styles.td, fontWeight: '700', textAlign: 'left' }}>{e.eleve}</td>
+                                                <td style={styles.td}>{e.notes.D1 ?? '-'}</td>
+                                                <td style={styles.td}>{e.notes.D2 ?? '-'}</td>
+                                                <td style={styles.td}>{e.notes.D3 ?? '-'}</td>
+                                                <td style={styles.td}>{e.notes.I1 ?? '-'}</td>
+                                                <td style={styles.td}>{e.notes.I2 ?? '-'}</td>
+                                                <td style={styles.td}>{e.notes.I3 ?? '-'}</td>
+                                                <td style={styles.td}>{e.notes.E1 ?? '-'}</td>
+                                                <td style={{ ...styles.td, fontWeight: '900', color: 'var(--primary)', backgroundColor: 'rgba(249, 177, 122, 0.05)' }}>
                                                     {e.moyenne}
                                                 </td>
                                             </tr>
@@ -117,8 +170,15 @@ const NotesParMatiere = () => {
                                 </table>
                             </div>
                         ) : (
-                            <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-dim)' }}>
-                                {loading ? "Chargement..." : "Aucune donnée disponible."}
+                            <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-dim)' }}>
+                                {loading ? (
+                                    <div className="flex flex-col items-center gap-3">
+                                        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
+                                        <span>Chargement des données...</span>
+                                    </div>
+                                ) : (
+                                    teacherData.length === 0 ? "Aucune donnée disponible (vérifiez que l'enseignant est bien affecté à des classes)." : "Aucun élève ou note validée pour cette sélection."
+                                )}
                             </div>
                         )}
                     </>
@@ -138,22 +198,22 @@ const NotesParMatiere = () => {
                             </select>
                         </div>
 
-                        <table style={tableStyle}>
+                        <table style={styles.table}>
                             <thead>
-                                <tr style={headerStyle}>
-                                    <th style={thStyle}>Élève</th>
-                                    <th style={{ ...thStyle, textAlign: 'center' }}>Note</th>
-                                    <th style={{ ...thStyle, textAlign: 'right' }}>Date</th>
+                                <tr style={styles.headerRow}>
+                                    <th style={styles.th}>Élève</th>
+                                    <th style={{ ...styles.th, textAlign: 'center' }}>Note</th>
+                                    <th style={{ ...styles.th, textAlign: 'right' }}>Date</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {notes.length > 0 ? notes.map((n, index) => (
-                                    <tr key={index} style={rowStyle}>
-                                        <td style={tdStyle}>{n.nom} {n.prenom}</td>
-                                        <td style={{ ...tdStyle, textAlign: 'center', fontWeight: '800', color: 'var(--secondary)' }}>
+                                    <tr key={index} style={styles.row}>
+                                        <td style={styles.td}>{n.nom} {n.prenom}</td>
+                                        <td style={{ ...styles.td, textAlign: 'center', fontWeight: '800', color: 'var(--secondary)' }}>
                                             {n.note} / 20
                                         </td>
-                                        <td style={{ ...tdStyle, textAlign: 'right', color: 'var(--text-dim)' }}>
+                                        <td style={{ ...styles.td, textAlign: 'right', color: 'var(--text-dim)' }}>
                                             {n.date_saisie ? new Date(n.date_saisie).toLocaleDateString() : 'N/A'}
                                         </td>
                                     </tr>
@@ -173,6 +233,16 @@ const NotesParMatiere = () => {
     );
 };
 
+const labelStyle = {
+    display: 'block',
+    marginBottom: '8px',
+    fontWeight: '800',
+    color: 'var(--secondary)',
+    fontSize: '0.75rem',
+    textTransform: 'uppercase',
+    letterSpacing: '1px'
+};
+
 const inputStyle = {
     width: '100%',
     padding: '12px 16px',
@@ -181,13 +251,28 @@ const inputStyle = {
     backgroundColor: '#fff',
     outline: 'none',
     fontSize: '0.9rem',
-    fontWeight: '600'
+    fontWeight: '600',
+    transition: 'border-color 0.2s',
 };
 
-const tableStyle = { width: '100%', borderCollapse: 'collapse' };
-const headerStyle = { borderBottom: '2px solid #f1f5f9', textAlign: 'left' };
-const thStyle = { padding: '16px', fontSize: '0.7rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: '800' };
-const tdStyle = { padding: '16px', borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' };
-const rowStyle = { transition: 'background 0.2s' };
+const styles = {
+    table: { width: '100%', borderCollapse: 'separate', borderSpacing: '0' },
+    headerRow: { borderBottom: '2px solid #f1f5f9', textAlign: 'left' },
+    th: {
+        padding: '16px',
+        fontSize: '0.7rem',
+        color: 'var(--text-dim)',
+        textTransform: 'uppercase',
+        fontWeight: '800',
+        borderBottom: '2px solid #f1f5f9'
+    },
+    td: {
+        padding: '16px',
+        borderBottom: '1px solid #f1f5f9',
+        fontSize: '0.9rem',
+        textAlign: 'center'
+    },
+    row: { transition: 'background 0.2s' }
+};
 
 export default NotesParMatiere;

@@ -9,11 +9,12 @@ $matiere_id = $_GET['matiere_id'] ?? null;
 if ($matiere_id) {
     try {
         // On utilise AS pour renommer les colonnes selon ce que ton React attend
-        $sql = "SELECT e.nom, e.prenom, n.valeur AS note, n.date_enregistrement AS date_saisie 
+        $sql = "SELECT u.nom, u.prenom, n.valeur AS note, n.date_note AS date_saisie 
                 FROM notes n
                 JOIN eleves e ON n.eleve_id = e.id
+                JOIN users u ON e.user_id = u.id
                 WHERE n.matiere_id = ?
-                ORDER BY n.date_enregistrement DESC";
+                ORDER BY n.date_note DESC";
         
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$matiere_id]);

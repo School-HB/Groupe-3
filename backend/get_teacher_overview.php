@@ -31,7 +31,7 @@ try {
     $classes_ids = $ensInfo['classes_ids'] ? explode(',', $ensInfo['classes_ids']) : [];
 
     if (empty($classes_ids)) {
-        echo json_encode(["classes" => [], "message" => "Aucune classe affectée"]);
+        echo json_encode([]);
         exit;
     }
 
@@ -53,21 +53,30 @@ try {
         $stmtEleves->execute([$c_id]);
         $elevesList = $stmtEleves->fetchAll(PDO::FETCH_ASSOC);
 
-        // Déterminer les matières à traiter
+        // Déterminer les matières à traiter (Supporte '/' et ' et ')
+        $matiere_nom_clean = str_replace(' et ', ' / ', $matiere_nom);
         $targets = [];
-        if ($matiere_nom === "Communication écrite / Lecture") {
-            $targets = [
-                ['nom' => 'Communication écrite', 'suffix' => ' (Comm. Écrite)'],
-                ['nom' => 'Lecture', 'suffix' => ' (Lecture)']
-            ];
+        if (strpos($matiere_nom_clean, '/') !== false) {
+            $parts = explode('/', $matiere_nom_clean);
+            foreach ($parts as $p) {
+                $p = trim($p);
+                $targets[] = ['nom' => $p, 'suffix' => " ($p)"];
+            }
         } else {
-            $targets = [['nom' => $matiere_nom, 'suffix' => '']];
+            $targets = [['nom' => trim($matiere_nom), 'suffix' => '']];
         }
 
         foreach ($targets as $target) {
-            $stmtMat = $pdo->prepare("SELECT id FROM matieres WHERE nom = ?");
+            $stmtMat = $pdo->prepare("SELECT id FROM matieres WHERE TRIM(nom) = ?");
             $stmtMat->execute([$target['nom']]);
             $matiere_id = $stmtMat->fetchColumn();
+
+            if (!$matiere_id) {
+                // Tentative de recherche plus souple si correspondance exacte échoue
+                $stmtMat = $pdo->prepare("SELECT id FROM matieres WHERE nom LIKE ?");
+                $stmtMat->execute(['%' . $target['nom'] . '%']);
+                $matiere_id = $stmtMat->fetchColumn();
+            }
 
             if (!$matiere_id) continue;
 
@@ -116,6 +125,11 @@ try {
                 "eleves" => $statsEleves
             ];
         }
+    }
+
+    if (empty($overview)) {
+        echo json_encode([]);
+        exit;
     }
 
     echo json_encode($overview);
